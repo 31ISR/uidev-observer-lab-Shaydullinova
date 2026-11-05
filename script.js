@@ -3,7 +3,6 @@ const progressBar = document.querySelector(".scroll-progress");
 const sidebar = document.querySelector(".scroll-indicator");
 const navLinks = document.querySelectorAll(".nav-links a");
 const options = {
-    threshold: 0.15,
     rootMargin: "0px 0px -80px 0px"
 };
 const container = document.querySelector('.particles');
@@ -65,23 +64,43 @@ navLinks.forEach((link) => {
     link.addEventListener("click", (event) => {
         event.preventDefault();
         const id = link.getAttribute("href");
-        console.log("Клик по ссылке на", id);
+        const section = document.querySelector(id);
+        section.scrollIntoView ({
+            behavior: "smooth"
+        });
     });
 });
- 
+
+const stats = document.querySelector(".stats");
+
 function countUp(element, target, duration = 2000) {
     let current = 0;
     const step = target / (duration / 16);
     const timer = setInterval(() => {
         current += step;
 
-        if(current>=target) {
+        if (current >= target) {
             current = target;
             clearInterval(timer);
         }
-        element.textContent = Math.floor(current);
+        element.textContent = current
+
     }, 16);
-}
+};
+
+const statsObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+            const counters = entry.target.querySelectorAll(".stat-number");
+            counters.forEach((counter) => {
+                countUp(counter, 2000)
+            })
+           observer.unobserve(entry.target);
+        };
+    });
+}, options);
+
+statsObserver.observe(stats)
 
 
 
