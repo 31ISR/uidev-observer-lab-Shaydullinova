@@ -82,8 +82,17 @@ function countUp(element, target, duration = 2000) {
         if (current >= target) {
             current = target;
             clearInterval(timer);
+
+            if (target === 1000000) {
+                element.textContent = "1 000 000";
+            } else if (target === 99.9) {
+                element.textContent = "99.9%";
+            } else if (target === 1) {
+                element.textContent = "1Gbps";
+            }
+        } else {
+            element.textContent = (current.toFixed(1));
         }
-        element.textContent = current
 
     }, 16);
 };
@@ -93,8 +102,12 @@ const statsObserver = new IntersectionObserver((entries, observer) => {
         if (entry.isIntersecting) {
             const counters = entry.target.querySelectorAll(".stat-number");
             counters.forEach((counter) => {
-                countUp(counter, 2000)
-            })
+                const target = Number(counter.dataset.target)
+
+                if (counter.dataset.target){
+                    countUp(counter, target);
+                }
+            });
            observer.unobserve(entry.target);
         };
     });
