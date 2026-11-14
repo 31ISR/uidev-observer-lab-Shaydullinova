@@ -1,0 +1,119 @@
+const cards = document.querySelectorAll(".animate-on-scroll, .service-card, .fade-in, .slide-up, .slide-right, .slide-left, .stagger-item, .scale-up");
+const progressBar = document.querySelector(".scroll-progress");
+const sidebar = document.querySelector(".scroll-indicator");
+const navLinks = document.querySelectorAll(".nav-links a");
+const options = {
+    rootMargin: "0px 0px -80px 0px"
+};
+const container = document.querySelector('.particles');
+const recipeObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+            const target = entry.target;
+
+            if (target.classList.contains("stagger-item")) {
+                const parentElement = entry.target.parentElement;
+                const items = parentElement.querySelectorAll(".stagger-item");
+                items.forEach((item, index) => {
+                    setTimeout(() => {
+                        item.classList.add('animate');
+                    }, index * 200);
+                });
+                items.forEach((item) => {
+                    recipeObserver.unobserve(item);
+                });
+            } else {
+                target.classList.add("animate");
+                recipeObserver.unobserve(target);
+            }
+        };
+    });
+}, options);
+
+cards.forEach((card) => {
+    recipeObserver.observe(card);
+});
+
+for (let i = 0; i < 50; i++) {
+    const flake = document.createElement("div");
+    flake.classList.add("particle");
+    flake.style.left = Math.random() * 100 + "%";
+    flake.style.animationDelay = Math.random() * 8 + "s";
+    flake.style.animationDuration = Math.random() * 6 + 6 + "s";
+    container.appendChild(flake);
+}
+
+window.addEventListener("scroll", () => {
+    if (progressBar) {
+        const scrollY = window.scrollY;
+        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        const percent = (scrollY / maxScroll) * 100;
+        progressBar.style.width = `${percent}%`;
+    };
+});
+
+window.addEventListener("scroll", () => {
+    if (window.scrollY > 250) {
+        sidebar.style.background = "rgba(20, 20, 60, 1)";
+    } else {
+        sidebar.style.background = "rgba(20, 20, 60, 0.5)";
+    }
+});
+
+navLinks.forEach((link) => {
+    link.addEventListener("click", (event) => {
+        event.preventDefault();
+        const id = link.getAttribute("href");
+        const section = document.querySelector(id);
+        section.scrollIntoView ({
+            behavior: "smooth"
+        });
+    });
+});
+
+const stats = document.querySelector(".stats");
+
+function countUp(element, target, duration = 2000) {
+    let current = 0;
+    const step = target / (duration / 16);
+    const timer = setInterval(() => {
+        current += step;
+
+        if (current >= target) {
+            current = target;
+            clearInterval(timer);
+
+            if (target === 1000000) {
+                element.textContent = "1 000 000";
+            } else if (target === 99.9) {
+                element.textContent = "99.9%";
+            } else if (target === 1) {
+                element.textContent = "1Gbps";
+            }
+        } else {
+            element.textContent = (current.toFixed(1));
+        }
+
+    }, 16);
+};
+
+const statsObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+            const counters = entry.target.querySelectorAll(".stat-number");
+            counters.forEach((counter) => {
+                const target = Number(counter.dataset.target)
+
+                if (counter.dataset.target){
+                    countUp(counter, target);
+                }
+            });
+           observer.unobserve(entry.target);
+        };
+    });
+}, options);
+
+statsObserver.observe(stats)
+
+
+
